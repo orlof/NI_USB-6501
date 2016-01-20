@@ -12,7 +12,7 @@ This python driver is based on Marc Schutz's pioneer work on c driver
 
 INSTALLATION
 
-1. Install the latest PyUSB (at least version 1.0.a3) from http://sourcceforge.net/projects/pyusb/
+1. Install the latest PyUSB (at least version 1.0.a3) from http://sourceforge.net/projects/pyusb/
 
 2. Change the permissions of the USB device node by creating a udev rule.
 e.g. add the following line (and file) to a file in /etc/udev/rules.d/usb.rules
