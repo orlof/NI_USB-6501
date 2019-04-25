@@ -183,7 +183,17 @@ class NiUsb6501:
                 expected: %s
                 mask:     %s
                 """ % (repr(actual), repr(expected), repr(mask)))
-
+    
+    def release_interface(self):
+        """
+        Free all resources, then the device can be used once again
+        """
+        if self.device.is_kernel_driver_active(self.interface_number):
+            self.device.detach_kernel_driver(self.interface_number)
+        usb.util.release_interface(self.device, self.INTERFACE)
+        usb.util.dispose_resources(self.device)
+        self.device.reset()
+        self.device = None
 
 #USAGE EXAMPLE
 if __name__ == "__main__":
@@ -198,3 +208,39 @@ if __name__ == "__main__":
     dev.write_port(1, 0b10101010)
 
     print bin(dev.read_port(2))
+
+    ret = dev.set_io_mode(0, 255, 0)      # set all pins between 3-6 & 27-30 as output pins
+    # example has special fokus on port 3 & 30, the values ot the others are all set to high
+    # bitmask: 247: 1111 0111
+    # 27: 1     low byte
+    # 28: 1     
+    # 29: 1     
+    # 30: 0
+    #  6: 1    
+    #  5: 1     
+    #  4: 1     
+    #  3: 1     high byte
+
+    ret = dev.write_port(1, 0)  # both zero
+    print(dev.read_port(1))
+
+    ret = dev.write_port(1, 247)  # 30 low
+    print(dev.read_port(1))
+
+    ret = dev.write_port(1, 127)  # 3 low
+    print(dev.read_port(1))
+
+    ret = dev.write_port(1, 247)  # 30 low
+    print(dev.read_port(1))
+
+    ret = dev.write_port(1, 127)  # 3 low
+    print(dev.read_port(1))
+
+    ret = dev.write_port(1, 0)  # both zero
+    print(dev.read_port(1))
+
+    ret = dev.write_port(1, 255)  # both high
+    print(dev.read_port(1))
+
+    dev.release_interface()     # clean exit, allows direct reuse without to replug the ni6501
+    del dev
